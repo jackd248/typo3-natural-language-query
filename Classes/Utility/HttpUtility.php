@@ -6,6 +6,8 @@ namespace Kmi\Typo3NaturalLanguageQuery\Utility;
 
 use Psr\Http\Message;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Http\Uri;
@@ -44,5 +46,14 @@ final class HttpUtility
 
         $GLOBALS['TYPO3_REQUEST'] = $request;
         return $request;
+    }
+
+    public static function buildAbsoluteUrlFromRoute(string $name, array $parameters): string
+    {
+        $request = self::getServerRequest();
+        Bootstrap::initializeBackendUser(request: $request);
+        $baseUrl = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
+        $path = GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute($name, $parameters)->__toString();
+        return $baseUrl . $path;
     }
 }
