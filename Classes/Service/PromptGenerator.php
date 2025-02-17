@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Kmi\Typo3NaturalLanguageQuery\Service;
 
 use Kmi\Typo3NaturalLanguageQuery\Configuration;
-use Kmi\Typo3NaturalLanguageQuery\Utility\GeneralHelper;
 use Kmi\Typo3NaturalLanguageQuery\Utility\HttpUtility;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;

@@ -7,7 +7,6 @@ namespace Kmi\Typo3NaturalLanguageQuery\Command;
 use Kmi\Typo3NaturalLanguageQuery\Connector\OpenAIConnector;
 use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
 use Kmi\Typo3NaturalLanguageQuery\Service\DatabaseService;
-use OpenAI;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,7 +18,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class QueryCommand extends Command
 {
-
     public function __construct(protected DatabaseService $databaseService, protected OpenAIConnector $openAIConnector, ?string $name = null)
     {
         parent::__construct($name);
@@ -89,7 +87,6 @@ final class QueryCommand extends Command
         $output->writeln('SQL Query: ' . $query->sqlQuery);
         $output->writeln('SQL Result: ' . $query->sqlResult);
         $output->writeln('Answer: ' . $query->answer);
-
 
         $io->info($query->answer);
 

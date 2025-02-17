@@ -9,8 +9,8 @@
 		}
 	],
 	"require": {
-		"typo3/cms-core": "^13.4",
-		"openai-php/client": "^0.10"
+		"openai-php/client": "^0.10",
+		"typo3/cms-core": "^13.4"
 	},
 	"require-dev": {
 		"armin/editorconfig-cli": "^2.0",

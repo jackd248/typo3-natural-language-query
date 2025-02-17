@@ -21,7 +21,7 @@ final class OpenAIConnector
     public function chat(Query &$query, string $desiredField = 'sqlQuery'): void
     {
         $parameters = [
-            'dialect' => $this->databaseService->getDialect(),
+            'dialect' => $this->databaseService->getDatabasePlatformAndVersion(),
             'tables' => [
                 0 => [
                     'name' => $query->table,
@@ -48,7 +48,7 @@ final class OpenAIConnector
             'prompt' => $prompt,
             'temperature' => $temperature,
             'max_tokens' => 100,
-            'logprobs' => 0
+            'logprobs' => 0,
         ]);
 
         return $completions->choices[0]->text;
@@ -60,23 +60,23 @@ final class OpenAIConnector
             if (str_contains($response, 'SQLResult')) {
                 $response = explode('SQLResult', $response)[0];
             }
-            $response = rtrim(str_replace(array("\r", "\n"), ' ', $response));
+            $response = rtrim(str_replace(["\r", "\n"], ' ', $response));
 
-            if (substr($response, -1) === "\"") {
+            if (substr($response, -1) === '"') {
                 $response= substr($response, 0, -1);
             }
             $query->{$desiredField} = $response;
             return;
         }
 
-//        preg_match('/Question: "(.*?)"/', $response, $question);
-//        preg_match('/SQLQuery: "(.*?)"/', $response, $sqlQuery);
-//        preg_match('/SQLResult: "(.*?)"/', $response, $sqlResult);
-//        preg_match('/Answer: "(.*?)"/', $response, $answer);
-//
-//        $query->question = $question[1];
-//        $query->sqlQuery = $sqlQuery[1];
-//        $query->sqlResult = $sqlResult[1];
-//        $query->answer = $answer[1];
+        //        preg_match('/Question: "(.*?)"/', $response, $question);
+        //        preg_match('/SQLQuery: "(.*?)"/', $response, $sqlQuery);
+        //        preg_match('/SQLResult: "(.*?)"/', $response, $sqlResult);
+        //        preg_match('/Answer: "(.*?)"/', $response, $answer);
+        //
+        //        $query->question = $question[1];
+        //        $query->sqlQuery = $sqlQuery[1];
+        //        $query->sqlResult = $sqlResult[1];
+        //        $query->answer = $answer[1];
     }
 }
