@@ -27,14 +27,14 @@ final class OpenAIConnector
     ) {
         $this->configuration = $this->extensionConfiguration->get(Configuration::EXT_KEY);
 
-        if ($this->configuration['api.key'] === '') {
+        if ($this->configuration['api']['key'] === '') {
             throw new \Exception('OpenAI API key is missing in extension configuration "api.key"', 2139736709);
         }
 
-        $this->client = OpenAI::client($this->configuration['api.key']);
+        $this->client = OpenAI::client($this->configuration['api']['key']);
     }
 
-    public function chat(Query &$query, QueryType $type): void
+    public function chat(Query &$query, QueryType $type = QueryType::QUERY): void
     {
         $parameters = $this->prepareParameters($query, $type);
         $prompt = $this->promptGenerator->renderPrompt($parameters);
@@ -65,7 +65,7 @@ final class OpenAIConnector
     protected function queryOpenAi(string $prompt, float $temperature = 0.0): string
     {
         $completions = $this->client->completions()->create([
-            'model' => $this->configuration['api.model'],
+            'model' => $this->configuration['api']['model'],
             'prompt' => $prompt,
             'temperature' => $temperature,
             'max_tokens' => 100,
@@ -77,24 +77,24 @@ final class OpenAIConnector
 
     protected function parseResponse(string $response, Query &$query, QueryType $type): void
     {
-        if (str_contains($response, 'SQLResult')) {
-            $response = explode('SQLResult', $response)[0];
+        $separator = 'SQLResult';
+        switch ($type) {
+            case QueryType::TABLE:
+                $separator = 'SQLQuery';
+                break;
+            case QueryType::QUERY:
+                $separator = 'SQLResult';
+                break;
+        }
+        if (str_contains($response, $separator)) {
+            $response = explode($separator, $response)[0];
         }
         $response = rtrim(str_replace(["\r", "\n"], ' ', $response));
 
         if (str_ends_with($response, '"')) {
             $response= substr($response, 0, -1);
         }
-        $query->{$type->value} = $response;
 
-        //        preg_match('/Question: "(.*?)"/', $response, $question);
-        //        preg_match('/SQLQuery: "(.*?)"/', $response, $sqlQuery);
-        //        preg_match('/SQLResult: "(.*?)"/', $response, $sqlResult);
-        //        preg_match('/Answer: "(.*?)"/', $response, $answer);
-        //
-        //        $query->question = $question[1];
-        //        $query->sqlQuery = $sqlQuery[1];
-        //        $query->sqlResult = $sqlResult[1];
-        //        $query->answer = $answer[1];
+        $query->{$type->value} = $response;
     }
 }

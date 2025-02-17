@@ -17,9 +17,12 @@ final class SchemaService
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName(Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME);
         $schemaManager = $connection->getSchemaInformation();
         foreach ($schemaManager->introspectSchema()->getTables() as $table) {
+            if (str_starts_with($table->getName(), 'sys_') || str_starts_with($table->getName(), 'cache_')) {
+                continue;
+            }
             $tables[] = [
                 'name' => $table->getName(),
-                'label' => $this->getLanguageService()->sL($GLOBALS['TCA'][$table->getName()]['ctrl']['title']),
+                'label' => isset($GLOBALS['TCA'][$table->getName()]['ctrl']['title']) ? $this->getLanguageService()->sL($GLOBALS['TCA'][$table->getName()]['ctrl']['title']) : $table->getName(),
             ];
         }
         return $tables;

@@ -25,21 +25,19 @@ final class QueryCommand extends Command
         $this
             ->setHelp('Ask a natural language question for querying database records')
             ->addArgument(
-                'table',
-                InputArgument::OPTIONAL,
-                '',
-            )
-            ->addArgument(
                 'question',
                 InputArgument::OPTIONAL,
-                '',
+            )
+            ->addArgument(
+                'table',
+                InputArgument::OPTIONAL,
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $output->writeln('TYPO3 Natural Language Query');
+        $io->title('TYPO3 Natural Language Query');
 
         $question = $input->getArgument('question');
         if ($question === null) {
@@ -47,17 +45,12 @@ final class QueryCommand extends Command
         }
 
         $table = $input->getArgument('table');
-        //        if ($table === null) {
-        //            $tableSelection = new ChoiceQuestion(
-        //                'Which table do you want to query?',
-        //                $this->getTables(),
-        //                0
-        //            );
-        //            $table = $io->askQuestion($tableSelection);
-        //        }
 
         $progressIndicator = new ProgressIndicator($output);
+        $progressIndicator->start('Thinking...');
+        $progressIndicator->advance();
         $query = $this->solver->solve($question, $table);
+        $progressIndicator->finish($query->answer);
 
         if ($output->isVerbose()) {
             $table = new Table($output);
@@ -71,23 +64,6 @@ final class QueryCommand extends Command
             $table->render();
         }
 
-        $progressIndicator->finish($query->answer);
         return Command::SUCCESS;
     }
-
-    //    private function getTables(): array
-    //    {
-    //        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
-    //        $schemaManager = $connection->getSchemaInformation();
-    //        $tables = $schemaManager->listTableNames();
-    //
-    //        foreach ($tables as $key => $table) {
-    //            if (str_starts_with($table, 'sys_')) {
-    //                unset($tables[$key]);
-    //            }
-    //        }
-    //        ksort($tables);
-    //
-    //        return $tables;
-    //    }
 }

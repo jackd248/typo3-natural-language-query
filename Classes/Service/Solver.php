@@ -22,7 +22,7 @@ final class Solver
             $this->openAIConnector->chat($query, QueryType::TABLE);
         }
 
-        $this->openAIConnector->chat($query, QueryType::QUERY);
+        $this->openAIConnector->chat($query);
         $this->databaseService->runDatabaseQuery($query);
 
         $this->openAIConnector->chat($query, QueryType::ANSWER);
