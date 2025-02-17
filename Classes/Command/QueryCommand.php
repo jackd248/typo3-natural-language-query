@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kmi\Typo3NaturalLanguageQuery\Command;
 
+use Kmi\Typo3NaturalLanguageQuery\Service\SchemaService;
 use Kmi\Typo3NaturalLanguageQuery\Service\Solver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressIndicator;
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class QueryCommand extends Command
 {
-    public function __construct(private readonly Solver $solver, ?string $name = null)
+    public function __construct(private readonly Solver $solver, private readonly SchemaService $schemaService, ?string $name = null)
     {
         parent::__construct($name);
     }
@@ -23,7 +24,7 @@ final class QueryCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setHelp('Ask a natural language question for querying database records')
+            ->setHelp('')
             ->addArgument(
                 'question',
                 InputArgument::OPTIONAL,
@@ -49,21 +50,36 @@ final class QueryCommand extends Command
         $progressIndicator = new ProgressIndicator($output);
         $progressIndicator->start('Thinking...');
         $progressIndicator->advance();
-        $query = $this->solver->solve($question, $table);
+        $query = $this->solver->solve(question: $question, table: $table);
         $progressIndicator->finish($query->answer);
 
         if ($output->isVerbose()) {
             $table = new Table($output);
             $table
-                ->setHeaders(['Question', 'Database Table', 'SQL Query', 'SQL Result', 'Answer'])
+                ->setHeaders(['Question', 'Database Table', 'SQL Query', 'SQL Result', 'Result Set', 'Answer'])
                 ->setRows([
-                    [$query->question, $query->table, $query->sqlQuery, $query->sqlResult, $query->answer],
+                    [$query->question, $query->table, $query->sqlQuery, $this->cutString($query->sqlResult), $this->cutString(json_encode($query->resultSet)), $query->answer],
                 ])
             ;
             $table->setVertical();
             $table->render();
         }
 
+        if ($query->resultSet !== null) {
+            $rows = $this->schemaService->prepareResultSet($query);
+            $table = new Table($output);
+            $table
+                ->setHeaders(['UID', 'Label', 'Link'])
+                ->setRows($rows)
+            ;
+            $table->render();
+        }
+
         return Command::SUCCESS;
+    }
+
+    private function cutString(string $string, int $length = 150): string
+    {
+        return (mb_strlen($string) > $length) ? mb_substr($string, 0, $length) . '…' : $string;
     }
 }
