@@ -1,0 +1,23 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<f:spaceless>
+Given an input question, first create a syntactically correct {dialect} query for a TYPO3 instance to run, then look at the results of the query and return the answer.
+Use the following format:
+
+Question: "Question here"
+SQLQuery: "SQL Query to run"
+SQLResult: "Result of the SQLQuery"
+Answer: "Final answer here"
+
+Only use the following tables and columns:
+<f:for each="{tables}" as="table">
+"{table.name}" has columns: <f:for each="{table.columns}" as="column">{column.name} ({column.type}),</f:for>
+</f:for>
+
+Question: "{question}"
+SQLQuery: "<f:if condition="{query}">{query}"
+SQLResult: "<f:if condition="{result}">{result -> f:format.raw()}"
+Answer: "
+</f:if>
+</f:if>
+</f:spaceless>

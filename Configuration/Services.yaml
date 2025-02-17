@@ -1,0 +1,18 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Kmi\Typo3NaturalLanguageQuery\:
+        resource: '../Classes/*'
+        exclude: '../Classes/Domain/Model/*'
+
+    Kmi\Typo3NaturalLanguageQuery\Command\QueryCommand:
+        tags:
+            -   name: console.command
+                command: 'ai:query'
+                description: ''
+
+    Kmi\Typo3NaturalLanguageQuery\Service\PromptGenerator:
+        public: true

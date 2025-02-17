@@ -1,0 +1,25 @@
+{
+	"name": "kmi/typo3-natural-language-query",
+	"description": "",
+	"type": "typo3-cms-extension",
+	"authors": [
+		{
+			"name": "Konrad Michalik",
+			"email": "hej@konradmichalik.dev"
+		}
+	],
+	"require": {
+		"typo3/cms-core": "^13.4",
+		"openai-php/client": "^0.10"
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "typo3_natural_language_query"
+		}
+	},
+	"autoload": {
+		"psr-4": {
+			"Kmi\\Typo3NaturalLanguageQuery\\": "Classes"
+		}
+	}
+}
