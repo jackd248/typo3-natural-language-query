@@ -15,13 +15,20 @@ final class DatabaseService
     {
     }
 
+    /**
+    * @throws \Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery
+    * @throws \Doctrine\DBAL\Exception
+    */
     public function runDatabaseQuery(Query &$query): void
     {
         $this->ensureQueryIsSafe($query->sqlQuery);
-        $result = json_encode($this->connectionPool->getConnectionForTable($query->table)->executeQuery($query->sqlQuery)->fetchAssociative());
+        $result = json_encode($this->connectionPool->getConnectionForTable($query->table)->executeQuery($query->sqlQuery)->fetchAllAssociative());
         $query->sqlResult = $result;
     }
 
+    /**
+    * @throws \Doctrine\DBAL\Exception
+    */
     public function getDatabasePlatformAndVersion(): ?string
     {
         try {
@@ -35,6 +42,24 @@ final class DatabaseService
         return $connection->getServerVersion();
     }
 
+    public function resolveResultSet(Query &$query): void
+    {
+        if ($query->resultSet !== null && $this->isArrayOnlyIntegerLike($query->resultSet)) {
+            $uids = $query->resultSet;
+        } else {
+            $uids = $this->extractUids(json_decode($query->sqlResult, true));
+        }
+        if ($uids === []) {
+            return;
+        }
+
+        $sql = sprintf('SELECT * FROM %s WHERE uid IN (%s)', $query->table, implode(',', $uids));
+        $query->resultSet = $this->connectionPool->getConnectionForTable($query->table)->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    /**
+    * @throws \Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery
+    */
     private function ensureQueryIsSafe(string $query): void
     {
         $query = strtolower($query);
@@ -44,5 +69,23 @@ final class DatabaseService
                 throw PotentiallyUnsafeQuery::fromQuery($query, $word);
             }
         }
+    }
+
+    private function isArrayOnlyIntegerLike(array $array): bool
+    {
+        return array_filter($array, fn ($value) => !(is_int($value) || (is_string($value) && ctype_digit($value)))) === [];
+    }
+
+    private function extractUids(array $data): array
+    {
+        $uids = [];
+
+        foreach ($data as $item) {
+            if (is_array($item) && isset($item['uid'])) {
+                $uids[] = $item['uid'];
+            }
+        }
+
+        return $uids;
     }
 }
