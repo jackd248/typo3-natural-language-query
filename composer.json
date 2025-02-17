@@ -44,7 +44,7 @@
 	"extra": {
 		"typo3/cms": {
 			"cms-package-dir": "{$vendor-dir}/typo3/cms",
-			"extension-key": "xima_typo3_frontend_edit",
+			"extension-key": "typo3_natural_language_query",
 			"web-dir": "public"
 		}
 	},
