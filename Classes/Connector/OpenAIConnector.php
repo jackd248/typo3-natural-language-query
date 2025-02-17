@@ -9,6 +9,7 @@ use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
 use Kmi\Typo3NaturalLanguageQuery\Service\DatabaseService;
 use Kmi\Typo3NaturalLanguageQuery\Service\PromptGenerator;
 use Kmi\Typo3NaturalLanguageQuery\Service\SchemaService;
+use Kmi\Typo3NaturalLanguageQuery\Type\QueryType;
 use OpenAI;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
@@ -33,27 +34,32 @@ final class OpenAIConnector
         $this->client = OpenAI::client($this->configuration['api.key']);
     }
 
-    public function chat(Query &$query, string $desiredField = 'sqlQuery'): void
+    public function chat(Query &$query, QueryType $type): void
     {
-        $parameters = [
-            'dialect' => $this->databaseService->getDatabasePlatformAndVersion(),
-            'tables' => [
-                0 => [
-                    'name' => $query->table,
-                    'columns' => $this->schemaService->describeFieldsOfTable($query->table),
-                ],
-            ],
-            'question' => $query->question,
-        ];
-
-        if ($desiredField === 'answer') {
-            $parameters['query'] = $query->sqlQuery;
-            $parameters['result'] = $query->sqlResult;
-        }
+        $parameters = $this->prepareParameters($query, $type);
         $prompt = $this->promptGenerator->renderPrompt($parameters);
 
         $response = $this->queryOpenAi($prompt);
-        $this->parseResponse($response, $query, $desiredField);
+        $this->parseResponse($response, $query, $type);
+    }
+
+    protected function prepareParameters(Query $query, QueryType $type): array
+    {
+        $parameters = [
+            'dialect' => $this->databaseService->getDatabasePlatformAndVersion(),
+            'query' => $query,
+        ];
+
+        switch ($type) {
+            case QueryType::TABLE:
+                $parameters['tables'] = $this->schemaService->describeTables();
+                break;
+            case QueryType::QUERY:
+                $parameters['tables'] = [$this->schemaService->describeTable($query->table)];
+                break;
+        }
+
+        return $parameters;
     }
 
     protected function queryOpenAi(string $prompt, float $temperature = 0.0): string
@@ -69,20 +75,17 @@ final class OpenAIConnector
         return $completions->choices[0]->text;
     }
 
-    protected function parseResponse(string $response, Query &$query, ?string $desiredField = null): void
+    protected function parseResponse(string $response, Query &$query, QueryType $type): void
     {
-        if ($desiredField) {
-            if (str_contains($response, 'SQLResult')) {
-                $response = explode('SQLResult', $response)[0];
-            }
-            $response = rtrim(str_replace(["\r", "\n"], ' ', $response));
-
-            if (substr($response, -1) === '"') {
-                $response= substr($response, 0, -1);
-            }
-            $query->{$desiredField} = $response;
-            return;
+        if (str_contains($response, 'SQLResult')) {
+            $response = explode('SQLResult', $response)[0];
         }
+        $response = rtrim(str_replace(["\r", "\n"], ' ', $response));
+
+        if (str_ends_with($response, '"')) {
+            $response= substr($response, 0, -1);
+        }
+        $query->{$type->value} = $response;
 
         //        preg_match('/Question: "(.*?)"/', $response, $question);
         //        preg_match('/SQLQuery: "(.*?)"/', $response, $sqlQuery);
