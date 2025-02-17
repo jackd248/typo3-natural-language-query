@@ -4,18 +4,33 @@ declare(strict_types=1);
 
 namespace Kmi\Typo3NaturalLanguageQuery\Connector;
 
+use Kmi\Typo3NaturalLanguageQuery\Configuration;
 use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
 use Kmi\Typo3NaturalLanguageQuery\Service\DatabaseService;
 use Kmi\Typo3NaturalLanguageQuery\Service\PromptGenerator;
+use Kmi\Typo3NaturalLanguageQuery\Service\SchemaService;
 use OpenAI;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
 final class OpenAIConnector
 {
     protected OpenAI\Client $client;
 
-    public function __construct(protected DatabaseService $databaseService, protected PromptGenerator $promptGenerator)
-    {
-        $this->client = OpenAI::client('ToDo');
+    protected array $configuration;
+
+    public function __construct(
+        private readonly DatabaseService $databaseService,
+        private readonly SchemaService $schemaService,
+        private readonly PromptGenerator $promptGenerator,
+        private readonly ExtensionConfiguration $extensionConfiguration
+    ) {
+        $this->configuration = $this->extensionConfiguration->get(Configuration::EXT_KEY);
+
+        if ($this->configuration['api.key'] === '') {
+            throw new \Exception('OpenAI API key is missing in extension configuration "api.key"', 2139736709);
+        }
+
+        $this->client = OpenAI::client($this->configuration['api.key']);
     }
 
     public function chat(Query &$query, string $desiredField = 'sqlQuery'): void
@@ -25,7 +40,7 @@ final class OpenAIConnector
             'tables' => [
                 0 => [
                     'name' => $query->table,
-                    'columns' => $this->databaseService->describeFieldsOfTable($query->table),
+                    'columns' => $this->schemaService->describeFieldsOfTable($query->table),
                 ],
             ],
             'question' => $query->question,
@@ -44,11 +59,11 @@ final class OpenAIConnector
     protected function queryOpenAi(string $prompt, float $temperature = 0.0): string
     {
         $completions = $this->client->completions()->create([
-            'model' => 'gpt-3.5-turbo-instruct',
+            'model' => $this->configuration['api.model'],
             'prompt' => $prompt,
             'temperature' => $temperature,
             'max_tokens' => 100,
-            'logprobs' => 0,
+            'logprobs' => 0, // https://github.com/openai-php/client/issues/522
         ]);
 
         return $completions->choices[0]->text;

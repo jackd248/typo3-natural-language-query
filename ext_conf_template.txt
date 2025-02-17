@@ -1,0 +1,4 @@
+# cat=api//10; type=string; label=OpenAI API key:Must be created on https://platform.openai.com/account/api-keys
+api.key =
+# cat=api//20; type=string; label=OpenAI API model:See https://platform.openai.com/docs/models
+api.model = gpt-3.5-turbo-instruct
