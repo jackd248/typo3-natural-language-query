@@ -77,7 +77,8 @@ final class OpenAIConnector
 
     protected function parseResponse(string $response, Query &$query, QueryType $type): void
     {
-        $separator = 'SQLResult';
+        $separator = null;
+        $explodeKey = 0;
         switch ($type) {
             case QueryType::TABLE:
                 $separator = 'SQLQuery';
@@ -85,9 +86,14 @@ final class OpenAIConnector
             case QueryType::QUERY:
                 $separator = 'SQLResult';
                 break;
+            case QueryType::ANSWER:
+                $separator = 'Answer: "';
+                $explodeKey = 1;
+                break;
         }
-        if (str_contains($response, $separator)) {
-            $response = explode($separator, $response)[0];
+
+        if ($separator && str_contains($response, $separator)) {
+            $response = explode($separator, $response)[$explodeKey];
         }
         $response = rtrim(str_replace(["\r", "\n"], ' ', $response));
 
@@ -95,6 +101,14 @@ final class OpenAIConnector
             $response= substr($response, 0, -1);
         }
 
+        if ($type === QueryType::ANSWER) {
+            if (str_contains($response, 'UID')) {
+                preg_match_all('/\(UID:\s*([\d,\s]+)\)/', $response, $matches);
+                $uids = isset($matches[1][0]) ? preg_split('/\s*,\s*/', $matches[1][0]) : [];
+                $response = preg_replace('/\(UID:\s*[\d,\s]+\)/', '', $response);
+                $query->resultSet = $uids;
+            }
+        }
         $query->{$type->value} = $response;
     }
 }
