@@ -8,7 +8,6 @@ use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
 use Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery;
 use TYPO3\CMS\Core;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class DatabaseService
 {
@@ -45,27 +44,5 @@ final class DatabaseService
                 throw PotentiallyUnsafeQuery::fromQuery($query, $word);
             }
         }
-    }
-
-    private function getFieldsByTable(string $tableName): array
-    {
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
-        $schemaManager = $connection->getSchemaInformation();
-
-        return $schemaManager->introspectSchema()->getTable($tableName)->getColumns();
-    }
-
-    public function describeFieldsOfTable(string $table): array
-    {
-        $fields = [];
-        foreach ($this->getFieldsByTable($table) as $field) {
-            $platform = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default')->getDatabasePlatform();
-            $fieldOptions = ['name' => $field->getName(), 'length' => $field->getLength()];
-            $fields[] = [
-                'name' => $field->getName(),
-                'type' => $field->getType()->getSQLDeclaration($fieldOptions, $platform),
-            ];
-        }
-        return $fields;
     }
 }
