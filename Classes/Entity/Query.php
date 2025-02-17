@@ -9,6 +9,7 @@ final class Query
     public string $question;
     public ?string $table = null;
     public ?string $sqlQuery = null;
+    public ?string $sqlError = null;
     public ?string $sqlResult = null;
     public ?string $answer = null;
     public ?array $resultSet = null;

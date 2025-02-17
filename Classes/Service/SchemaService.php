@@ -14,6 +14,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class SchemaService
 {
+    /**
+    * @throws \Doctrine\DBAL\Exception
+    */
     public function describeTables(): array
     {
         $tables = [];
@@ -31,6 +34,9 @@ final class SchemaService
         return $tables;
     }
 
+    /**
+    * @throws \Doctrine\DBAL\Exception
+    */
     public function describeTable(string $table): array
     {
         return [
@@ -52,6 +58,9 @@ final class SchemaService
         return $result;
     }
 
+    /**
+    * @throws \Doctrine\DBAL\Exception
+    */
     private function describeFieldsOfTable(string $table): array
     {
         $fields = [];
@@ -109,7 +118,7 @@ final class SchemaService
             false,
             false,
             $row['uid'] ?? null,
-            0,
+            false,
             0,
             $row
         ) ?? '';

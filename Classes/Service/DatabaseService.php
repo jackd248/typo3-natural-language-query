@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Kmi\Typo3NaturalLanguageQuery\Service;
 
+use Doctrine\DBAL\Exception\SyntaxErrorException;
 use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
 use Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery;
+use Kmi\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid;
 use TYPO3\CMS\Core;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
@@ -18,11 +20,18 @@ final class DatabaseService
     /**
     * @throws \Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery
     * @throws \Doctrine\DBAL\Exception
+    * @throws \Kmi\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid
     */
     public function runDatabaseQuery(Query &$query): void
     {
         $this->ensureQueryIsSafe($query->sqlQuery);
-        $result = json_encode($this->connectionPool->getConnectionForTable($query->table)->executeQuery($query->sqlQuery)->fetchAllAssociative());
+        try {
+            $result = json_encode($this->connectionPool->getConnectionForTable($query->table)->executeQuery($query->sqlQuery)->fetchAllAssociative());
+        } catch (SyntaxErrorException $e) {
+            $message = $e->getMessage();
+            $query->sqlError = $message;
+            throw SqlQueryIsNotValid::fromQuery($query, $message);
+        }
         $query->sqlResult = $result;
     }
 
@@ -44,7 +53,7 @@ final class DatabaseService
 
     public function resolveResultSet(Query &$query): void
     {
-        if ($query->resultSet !== null && $this->isArrayOnlyIntegerLike($query->resultSet)) {
+        if ($query->resultSet !== null && $query->resultSet !== [] && $this->isArrayOnlyIntegerLike($query->resultSet)) {
             $uids = $query->resultSet;
         } else {
             $uids = $this->extractUids(json_decode($query->sqlResult, true));
@@ -86,6 +95,7 @@ final class DatabaseService
             }
         }
 
-        return $uids;
+        ksort($uids);
+        return array_unique($uids);
     }
 }

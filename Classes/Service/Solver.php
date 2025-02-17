@@ -6,6 +6,7 @@ namespace Kmi\Typo3NaturalLanguageQuery\Service;
 
 use Kmi\Typo3NaturalLanguageQuery\Connector\OpenAIConnector;
 use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
+use Kmi\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid;
 use Kmi\Typo3NaturalLanguageQuery\Type\QueryType;
 use OpenAI\Exceptions\ErrorException;
 
@@ -32,7 +33,14 @@ final class Solver
         }
 
         $this->openAIConnector->chat($query);
-        $this->databaseService->runDatabaseQuery($query);
+
+        try {
+            $this->databaseService->runDatabaseQuery($query);
+        } catch (SqlQueryIsNotValid $sqlError) {
+            $query->sqlQuery = null;
+            $query->sqlError = $sqlError->getMessage();
+            $this->solve($query);
+        }
 
         try {
             $this->openAIConnector->chat($query, QueryType::ANSWER);
