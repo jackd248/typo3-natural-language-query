@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kmi\Typo3NaturalLanguageQuery\Command;
 
-use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
 use Kmi\Typo3NaturalLanguageQuery\Service\Solver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressIndicator;
@@ -12,10 +11,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class QueryCommand extends Command
 {
@@ -27,7 +23,7 @@ final class QueryCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setHelp('')
+            ->setHelp('Ask a natural language question for querying database records')
             ->addArgument(
                 'table',
                 InputArgument::OPTIONAL,

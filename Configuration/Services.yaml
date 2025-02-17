@@ -11,8 +11,8 @@ services:
     Kmi\Typo3NaturalLanguageQuery\Command\QueryCommand:
         tags:
             -   name: console.command
-                command: 'ai:query'
-                description: ''
+                command: 'nlq:ask'
+                description: 'Ask a natural language question for querying database records.'
 
     Kmi\Typo3NaturalLanguageQuery\Service\PromptGenerator:
         public: true
