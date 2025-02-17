@@ -92,21 +92,33 @@ final class OpenAIConnector
                 break;
         }
 
-        if ($separator && str_contains($response, $separator)) {
+        // We just want a part of the response
+        if (str_contains($response, $separator)) {
             $response = explode($separator, $response)[$explodeKey];
         }
+
+        // If the table is responded with the description brackets, remove them
+        if ($type === QueryType::TABLE) {
+            $response = trim(preg_replace('/\s*\(.*?\)\s*/', '', $response));
+        }
+
+        // Remove newlines and carriage returns
         $response = rtrim(str_replace(["\r", "\n"], ' ', $response));
 
+        // Remove trailing quotes
         if (str_ends_with($response, '"')) {
             $response= substr($response, 0, -1);
         }
 
+        // Fetch UIDs from answer
         if ($type === QueryType::ANSWER) {
-            if (str_contains($response, 'UID')) {
-                preg_match_all('/\(UID:\s*([\d,\s]+)\)/', $response, $matches);
+            if (str_contains($response, 'UID=')) {
+                preg_match_all('/\(UID=\s*([\d,\s]+)\)/', $response, $matches);
                 $uids = isset($matches[1][0]) ? preg_split('/\s*,\s*/', $matches[1][0]) : [];
-                $response = preg_replace('/\(UID:\s*[\d,\s]+\)/', '', $response);
+                $response = preg_replace('/\(UID=\s*[\d,\s]+\)/', '', $response);
                 $query->resultSet = $uids;
+            } else {
+                $response = trim(preg_replace('/\s*\(.*?\)\s*/', '', $response));
             }
         }
         $query->{$type->value} = $response;

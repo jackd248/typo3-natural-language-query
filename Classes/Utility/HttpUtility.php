@@ -7,6 +7,7 @@ namespace Kmi\Typo3NaturalLanguageQuery\Utility;
 use Psr\Http\Message;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Core\Authentication\CommandLineUserAuthentication;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -48,10 +49,18 @@ final class HttpUtility
         return $request;
     }
 
+    /**
+    * ToDo: DummyToken in CLI Context
+    *
+    * @param string $name
+    * @param array $parameters
+    * @return string
+    * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+    */
     public static function buildAbsoluteUrlFromRoute(string $name, array $parameters): string
     {
         $request = self::getServerRequest();
-        Bootstrap::initializeBackendUser(request: $request);
+        Bootstrap::initializeBackendUser(CommandLineUserAuthentication::class, $request);
         $baseUrl = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
         $path = GeneralUtility::makeInstance(UriBuilder::class)->buildUriFromRoute($name, $parameters)->__toString();
         return $baseUrl . $path;
