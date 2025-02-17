@@ -11,6 +11,8 @@ final class Query
     public ?string $sqlQuery = null;
     public ?string $sqlResult = null;
     public ?string $answer = null;
+    public ?array $resultSet = null;
+    public bool $maximumPromptLengthExceeded = false;
 
     public function __construct(string $question, ?string $table = null)
     {
