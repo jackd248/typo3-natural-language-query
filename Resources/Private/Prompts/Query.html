@@ -12,19 +12,15 @@ Answer: "Final answer here"
 <f:if condition="!{query.table}">
 <f:then>
 First determine the desired table to use for answering the question.
-<f:for each="{tables}" as="table">
-"{table.name}" ({table.label}),
-</f:for>
+<f:for each="{tables}" as="table">"{table.name}" ({table.label}),</f:for>
 </f:then>
 <f:else>
 Only use the following tables and columns:
-<f:for each="{tables}" as="table">
-"{table.name}" has columns: <f:for each="{table.columns}" as="column">{column.name} ({column.type}),</f:for>
-</f:for>
+<f:for each="{tables}" as="table">"{table.name}" has columns: <f:for each="{table.columns}" as="column">{column.name} ({column.type}),</f:for></f:for>
 </f:else>
 </f:if>
 
-Question: "{question}"
+Question: "{query.question}"
 DesiredTable: "<f:if condition="{query.table}">{query.table}"
 SQLQuery: "<f:if condition="{query.sqlQuery}">{query.sqlQuery}"
 SQLResult: "<f:if condition="{query.sqlResult}">{query.sqlResult} -> f:format.raw()}"
