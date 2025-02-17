@@ -4,34 +4,36 @@ declare(strict_types=1);
 
 namespace Kmi\Typo3NaturalLanguageQuery\Service;
 
-use Kmi\Typo3NaturalLanguageQuery\Configuration;
 use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
-use Kmi\Typo3NaturalLanguageQuery\Utility\GeneralHelper;
+use Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery;
+use TYPO3\CMS\Core;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\View\ViewFactoryData;
-use TYPO3\CMS\Core\View\ViewFactoryInterface;
 
 final class DatabaseService
 {
+    public function __construct(private readonly ConnectionPool $connectionPool)
+    {
+    }
+
     public function runDatabaseQuery(Query &$query): void
     {
         $this->ensureQueryIsSafe($query->sqlQuery);
-
-        if (substr($query->sqlQuery, -1) === "\"") {
-            $query->sqlQuery = substr($query->sqlQuery, 0, -1);
-        }
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($query->table);
-
-        $result = json_encode($connection->executeQuery($query->sqlQuery)->fetchAssociative());
+        $result = json_encode($this->connectionPool->getConnectionForTable($query->table)->executeQuery($query->sqlQuery)->fetchAssociative());
         $query->sqlResult = $result;
     }
 
-    public function getDialect(): string
+    public function getDatabasePlatformAndVersion(): ?string
     {
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName('Default');
-        // ToDo
-        return 'MariaDB';
+        try {
+            $connection = $this->connectionPool->getConnectionByName(
+                Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME,
+            );
+        } catch (\Exception) {
+            return null;
+        }
+
+        return $connection->getServerVersion();
     }
 
     private function ensureQueryIsSafe(string $query): void
@@ -39,8 +41,8 @@ final class DatabaseService
         $query = strtolower($query);
         $forbiddenWords = ['insert ', 'update ', 'delete ', 'alter ', 'drop ', 'truncate ', 'create ', 'replace '];
         foreach ($forbiddenWords as $word) {
-            if (strpos($query, $word) !== false) {
-                throw new \Exception('Query contains potential forbidden word: ' . $word);
+            if (str_contains($query, $word)) {
+                throw PotentiallyUnsafeQuery::fromQuery($query, $word);
             }
         }
     }
