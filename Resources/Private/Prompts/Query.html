@@ -1,13 +1,14 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
 <f:spaceless>
-Given an input question, first create a syntactically correct {dialect} query for a TYPO3 instance to run, then look at the results of the query and return the answer.
+Given an input question, first create a syntactically correct {dialect} query for a TYPO3 instance to run, then look at the results of the query and return the answer. If the answer refers to one or more specific data sets, also provide the individual UIDs.
+<f:if condition="{query.maximumPromptLengthExceeded}">Try to reduce the sql result in your query while only fetching the necessary uids.</f:if>
 Use the following format:
 
 Question: "Question here"
 DesiredTable: "Table to use"
 SQLQuery: "SQL Query to run"
 SQLResult: "Result of the SQLQuery"
-Answer: "Final answer here"
+Answer: "Final answer here (Optional UIDs comma separated)"
 
 <f:if condition="!{query.table}">
 <f:then>
