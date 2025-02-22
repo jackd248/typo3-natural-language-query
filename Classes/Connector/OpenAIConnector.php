@@ -82,8 +82,8 @@ final class OpenAIConnector
     }
 
     /**
-     * ToDo: This needs to be refactored to a more generic way to parse the response.
-     */
+    * ToDo: This needs to be refactored to a more generic way to parse the response.
+    */
     protected function parseResponse(string $response, Query &$query, QueryType $type): void
     {
         $separator = null;

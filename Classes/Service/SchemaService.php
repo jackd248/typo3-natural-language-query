@@ -102,9 +102,9 @@ final class SchemaService
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     * @throws \Doctrine\DBAL\Exception
-     */
+    * @throws \Doctrine\DBAL\Schema\SchemaException
+    * @throws \Doctrine\DBAL\Exception
+    */
     private function getFieldsByTable(string $tableName): array
     {
         $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($this->configuration['database']['connection']);
