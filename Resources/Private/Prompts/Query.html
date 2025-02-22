@@ -25,7 +25,7 @@ Only use the following tables and columns:
 Question: "{query.question}"
 DesiredTable: "<f:if condition="{query.table}">{query.table}"
 SQLQuery: "<f:if condition="{query.sqlQuery}">{query.sqlQuery}"
-SQLResult: "<f:if condition="{query.sqlResult}">{query.sqlResult} -> f:format.raw()}"
+SQLResult: "<f:if condition="{query.sqlResult}">{query.sqlResult -> f:format.raw()}"
 Answer: "
 </f:if>
 </f:if>
