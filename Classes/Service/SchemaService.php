@@ -4,26 +4,38 @@ declare(strict_types=1);
 
 namespace Kmi\Typo3NaturalLanguageQuery\Service;
 
+use Doctrine\DBAL\Exception\InvalidColumnDeclaration;
+use Doctrine\DBAL\Exception\InvalidColumnType;
+use Doctrine\DBAL\Exception\InvalidColumnType\ColumnPrecisionRequired;
+use Kmi\Typo3NaturalLanguageQuery\Configuration;
 use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
 use Kmi\Typo3NaturalLanguageQuery\Utility\HttpUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class SchemaService
 {
+    protected array $configuration;
+
+    public function __construct(
+        private readonly ExtensionConfiguration $extensionConfiguration
+    ) {
+        $this->configuration = $this->extensionConfiguration->get(Configuration::EXT_KEY);
+    }
+
     /**
     * @throws \Doctrine\DBAL\Exception
     */
     public function describeTables(): array
     {
         $tables = [];
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName(Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME);
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($this->configuration['database']['connection']);
         $schemaManager = $connection->getSchemaInformation();
         foreach ($schemaManager->introspectSchema()->getTables() as $table) {
-            if (str_starts_with($table->getName(), 'sys_') || str_starts_with($table->getName(), 'cache_')) {
+            if ($this->matchesIgnoredTables($table->getName())) {
                 continue;
             }
             $tables[] = [
@@ -52,7 +64,7 @@ final class SchemaService
             $result[] = [
                 'uid' => $resultRow['uid'],
                 'label' => $this->getRecordTitle($query->table, $resultRow),
-                'link' => HttpUtility::buildAbsoluteUrlFromRoute('record_edit', ['edit' => [$query->table => [$resultRow['uid'] => 'edit']]]),
+                'link' => $this->getRecordLink($query->table, $resultRow['uid']),
             ];
         }
         return $result;
@@ -65,19 +77,37 @@ final class SchemaService
     {
         $fields = [];
         foreach ($this->getFieldsByTable($table) as $field) {
-            $platform = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName(Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME)->getDatabasePlatform();
+            if ($this->matchesIgnoredFields($field->getName())) {
+                continue;
+            }
+
+            $platform = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($this->configuration['database']['connection'])->getDatabasePlatform();
             $fieldOptions = ['name' => $field->getName(), 'length' => $field->getLength()];
+            $type = '';
+            try {
+                $type = $field->getType()->getSQLDeclaration($fieldOptions, $platform);
+            } catch (ColumnPrecisionRequired $exception) {
+                // ToDo
+            } catch (InvalidColumnDeclaration $exception) {
+                // ToDo
+            } catch (InvalidColumnType $exception) {
+                // ToDo
+            }
             $fields[] = [
                 'name' => $field->getName(),
-                'type' => $field->getType()->getSQLDeclaration($fieldOptions, $platform),
+                'type' => $type,
             ];
         }
         return $fields;
     }
 
+    /**
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Doctrine\DBAL\Exception
+     */
     private function getFieldsByTable(string $tableName): array
     {
-        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName(Core\Database\ConnectionPool::DEFAULT_CONNECTION_NAME);
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionByName($this->configuration['database']['connection']);
         $schemaManager = $connection->getSchemaInformation();
 
         return $schemaManager->introspectSchema()->getTable($tableName)->getColumns();
@@ -150,6 +180,39 @@ final class SchemaService
         }
 
         return $recordTitle;
+    }
+
+    private function matchesIgnoredTables(string $table): bool
+    {
+        foreach ($this->configuration['database']['ignore_tables'] as $ignoredTable) {
+            if (str_contains($ignoredTable, '*')) {
+                $pattern = str_replace('*', '.*', $ignoredTable);
+                if (preg_match('/^' . $pattern . '$/', $table)) {
+                    return true;
+                }
+            } elseif ($table === $ignoredTable) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function matchesIgnoredFields(string $field): bool
+    {
+        foreach ($this->configuration['database']['ignore_fields'] as $ignoredTable) {
+            if ($field === $ignoredTable) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function getRecordLink(string $table, int $uid): string
+    {
+        return match ($table) {
+            'pages' => HttpUtility::buildAbsoluteUrlFromRoute('web_layout', ['id' => $uid]),
+            default => HttpUtility::buildAbsoluteUrlFromRoute('record_edit', ['edit' => [$table => [$uid => 'edit']]])
+        };
     }
 
     private function getLanguageService(): LanguageService

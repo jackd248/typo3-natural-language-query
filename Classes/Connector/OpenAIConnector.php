@@ -15,7 +15,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
 final class OpenAIConnector
 {
-    protected OpenAI\Client $client;
+    protected ?OpenAI\Client $client = null;
 
     protected array $configuration;
 
@@ -26,12 +26,6 @@ final class OpenAIConnector
         private readonly ExtensionConfiguration $extensionConfiguration
     ) {
         $this->configuration = $this->extensionConfiguration->get(Configuration::EXT_KEY);
-
-        if ($this->configuration['api']['key'] === '') {
-            throw new \Exception('OpenAI API key is missing in extension configuration "api.key"', 2139736709);
-        }
-
-        $this->client = OpenAI::client($this->configuration['api']['key']);
     }
 
     public function chat(Query &$query, QueryType $type = QueryType::QUERY): void
@@ -64,6 +58,9 @@ final class OpenAIConnector
 
     protected function queryOpenAi(string $prompt, float $temperature = 0.0): string
     {
+        if ($this->client === null) {
+            $this->initClient();
+        }
         $completions = $this->client->completions()->create([
             'model' => $this->configuration['api']['model'],
             'prompt' => $prompt,
@@ -75,6 +72,18 @@ final class OpenAIConnector
         return $completions->choices[0]->text;
     }
 
+    protected function initClient(): void
+    {
+        if ($this->configuration['api']['key'] === '') {
+            throw new \Exception('OpenAI API key is missing in extension configuration "api.key"', 2139736709);
+        }
+
+        $this->client = OpenAI::client($this->configuration['api']['key']);
+    }
+
+    /**
+     * ToDo: This needs to be refactored to a more generic way to parse the response.
+     */
     protected function parseResponse(string $response, Query &$query, QueryType $type): void
     {
         $separator = null;
@@ -107,7 +116,7 @@ final class OpenAIConnector
 
         // Remove trailing quotes
         if (str_ends_with($response, '"')) {
-            $response= substr($response, 0, -1);
+            $response = substr($response, 0, -1);
         }
 
         // Fetch UIDs from answer

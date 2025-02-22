@@ -2,3 +2,11 @@
 api.key =
 # cat=api//20; type=string; label=OpenAI API model:See https://platform.openai.com/docs/models
 api.model = gpt-3.5-turbo-instruct
+# cat=database//10; type=boolean; label=In strict mode, an exception will be thrown if the query attempts to perform a write or alter operation on the database.
+database.strict_mode = 1
+# cat=database//20; type=string; label=The name of the database connection to use. Depending on your needs, you may want to restrict the database user to read-only access.
+database.connection = Default
+# cat=database//30; type=string; label=Ignore the specified tables when performing database operations. Separate multiple tables with commas, use an asterix for a wildcard.
+database.ignore_tables = sys_*, cache_*, cf_*
+# cat=database//40; type=string; label=Ignore the specified fields when performing database operations. Separate multiple tables with commas, use an asterix for a wildcard.
+database.ignore_fields = password
