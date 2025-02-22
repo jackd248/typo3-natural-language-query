@@ -11,6 +11,7 @@ use KonradMichalik\Typo3NaturalLanguageQuery\Service\PromptGenerator;
 use KonradMichalik\Typo3NaturalLanguageQuery\Service\SchemaService;
 use KonradMichalik\Typo3NaturalLanguageQuery\Type\QueryType;
 use OpenAI;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
 final class OpenAIConnector
@@ -23,7 +24,8 @@ final class OpenAIConnector
         private readonly DatabaseService $databaseService,
         private readonly SchemaService $schemaService,
         private readonly PromptGenerator $promptGenerator,
-        private readonly ExtensionConfiguration $extensionConfiguration
+        private readonly ExtensionConfiguration $extensionConfiguration,
+        private readonly LoggerInterface $logger
     ) {
         $this->configuration = $this->extensionConfiguration->get(Configuration::EXT_KEY);
     }
@@ -33,7 +35,9 @@ final class OpenAIConnector
         $parameters = $this->prepareParameters($query, $type);
         $prompt = $this->promptGenerator->renderPrompt($parameters);
 
+        $this->logger->info('[Generated Prompt] ' . $prompt);
         $response = $this->queryOpenAi($prompt);
+        $this->logger->info('[OpenAI Response] ' . $response);
         $this->parseResponse($response, $query, $type);
     }
 
@@ -130,6 +134,8 @@ final class OpenAIConnector
                 $response = trim(preg_replace('/\s*\(.*?\)\s*/', '', $response));
             }
         }
+
+        $this->logger->info('[Parsed Response][' . $type->value . '] ' . $response);
         $query->{$type->value} = $response;
     }
 }
