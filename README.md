@@ -1,5 +1,7 @@
 <div align="center">
 
+![Extension icon](Resources/Public/Icons/Extension.svg)
+
 # TYPO3 extension `typo3_natural_language_query`
 
 </div>
@@ -8,6 +10,8 @@ This extension provides a natural language query interface for TYPO3 records.
 
 > [!NOTE]  
 > This extension is meant to be a proof of concept for prompt engineering and query building using OpenAI. You should probably not use this in production
+
+![Screencast](./Documentation/Images/screencast.gif)
 
 ## Installation
 
