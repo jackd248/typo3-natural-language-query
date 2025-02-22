@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Type;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Type;
 
 enum QueryType: string
 {

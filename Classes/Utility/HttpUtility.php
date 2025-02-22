@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Utility;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Utility;
 
 use Psr\Http\Message;
 use Psr\Http\Message\ServerRequestInterface;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Service;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Service;
 
 use Doctrine\DBAL\Exception\SyntaxErrorException;
-use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
-use Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery;
-use Kmi\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid;
+use KonradMichalik\Typo3NaturalLanguageQuery\Entity\Query;
+use KonradMichalik\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery;
+use KonradMichalik\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid;
 use TYPO3\CMS\Core;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
@@ -18,9 +18,9 @@ final class DatabaseService
     }
 
     /**
-    * @throws \Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery
+    * @throws \KonradMichalik\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery
     * @throws \Doctrine\DBAL\Exception
-    * @throws \Kmi\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid
+    * @throws \KonradMichalik\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid
     */
     public function runDatabaseQuery(Query &$query): void
     {
@@ -67,7 +67,7 @@ final class DatabaseService
     }
 
     /**
-    * @throws \Kmi\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery
+    * @throws \KonradMichalik\Typo3NaturalLanguageQuery\Exception\PotentiallyUnsafeQuery
     */
     private function ensureQueryIsSafe(string $query): void
     {

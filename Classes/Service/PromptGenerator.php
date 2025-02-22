@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Service;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Service;
 
-use Kmi\Typo3NaturalLanguageQuery\Configuration;
-use Kmi\Typo3NaturalLanguageQuery\Utility\HttpUtility;
+use KonradMichalik\Typo3NaturalLanguageQuery\Configuration;
+use KonradMichalik\Typo3NaturalLanguageQuery\Utility\HttpUtility;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 

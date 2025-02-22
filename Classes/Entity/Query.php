@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Entity;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Entity;
 
 final class Query
 {

@@ -4,15 +4,15 @@ services:
         autoconfigure: true
         public: false
 
-    Kmi\Typo3NaturalLanguageQuery\:
+    KonradMichalik\Typo3NaturalLanguageQuery\:
         resource: '../Classes/*'
         exclude: '../Classes/Domain/Model/*'
 
-    Kmi\Typo3NaturalLanguageQuery\Command\QueryCommand:
+    KonradMichalik\Typo3NaturalLanguageQuery\Command\QueryCommand:
         tags:
             -   name: console.command
                 command: 'nlq:ask'
                 description: 'Ask a natural language question for querying database records.'
 
-    Kmi\Typo3NaturalLanguageQuery\Service\PromptGenerator:
+    KonradMichalik\Typo3NaturalLanguageQuery\Service\PromptGenerator:
         public: true

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Connector;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Connector;
 
-use Kmi\Typo3NaturalLanguageQuery\Configuration;
-use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
-use Kmi\Typo3NaturalLanguageQuery\Service\DatabaseService;
-use Kmi\Typo3NaturalLanguageQuery\Service\PromptGenerator;
-use Kmi\Typo3NaturalLanguageQuery\Service\SchemaService;
-use Kmi\Typo3NaturalLanguageQuery\Type\QueryType;
+use KonradMichalik\Typo3NaturalLanguageQuery\Configuration;
+use KonradMichalik\Typo3NaturalLanguageQuery\Entity\Query;
+use KonradMichalik\Typo3NaturalLanguageQuery\Service\DatabaseService;
+use KonradMichalik\Typo3NaturalLanguageQuery\Service\PromptGenerator;
+use KonradMichalik\Typo3NaturalLanguageQuery\Service\SchemaService;
+use KonradMichalik\Typo3NaturalLanguageQuery\Type\QueryType;
 use OpenAI;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 

@@ -1,6 +1,6 @@
 {
 	"name": "konradmichalik/typo3-natural-language-query",
-	"description": "",
+	"description": "This extension provides a natural language query interface for TYPO3 records.",
 	"type": "typo3-cms-extension",
 	"authors": [
 		{
@@ -27,7 +27,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Kmi\\Typo3NaturalLanguageQuery\\": "Classes"
+			"KonradMichalik\\Typo3NaturalLanguageQuery\\": "Classes"
 		}
 	},
 	"config": {

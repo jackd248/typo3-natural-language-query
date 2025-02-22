@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Service;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Service;
 
-use Kmi\Typo3NaturalLanguageQuery\Connector\OpenAIConnector;
-use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
-use Kmi\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid;
-use Kmi\Typo3NaturalLanguageQuery\Type\QueryType;
+use KonradMichalik\Typo3NaturalLanguageQuery\Connector\OpenAIConnector;
+use KonradMichalik\Typo3NaturalLanguageQuery\Entity\Query;
+use KonradMichalik\Typo3NaturalLanguageQuery\Exception\SqlQueryIsNotValid;
+use KonradMichalik\Typo3NaturalLanguageQuery\Type\QueryType;
 use OpenAI\Exceptions\ErrorException;
 
 final class Solver

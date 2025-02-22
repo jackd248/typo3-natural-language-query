@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Exception;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Exception;
 
 use Exception;
 

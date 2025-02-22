@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Command;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Command;
 
-use Kmi\Typo3NaturalLanguageQuery\Service\SchemaService;
-use Kmi\Typo3NaturalLanguageQuery\Service\Solver;
+use KonradMichalik\Typo3NaturalLanguageQuery\Service\SchemaService;
+use KonradMichalik\Typo3NaturalLanguageQuery\Service\Solver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Helper\Table;

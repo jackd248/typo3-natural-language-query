@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery;
+namespace KonradMichalik\Typo3NaturalLanguageQuery;
 
 class Configuration
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Exception;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Exception;
 
 use Exception;
-use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
+use KonradMichalik\Typo3NaturalLanguageQuery\Entity\Query;
 
 final class SqlQueryIsNotValid extends Exception
 {

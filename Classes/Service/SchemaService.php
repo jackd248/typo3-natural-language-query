@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Kmi\Typo3NaturalLanguageQuery\Service;
+namespace KonradMichalik\Typo3NaturalLanguageQuery\Service;
 
 use Doctrine\DBAL\Exception\InvalidColumnDeclaration;
 use Doctrine\DBAL\Exception\InvalidColumnType;
 use Doctrine\DBAL\Exception\InvalidColumnType\ColumnPrecisionRequired;
-use Kmi\Typo3NaturalLanguageQuery\Configuration;
-use Kmi\Typo3NaturalLanguageQuery\Entity\Query;
-use Kmi\Typo3NaturalLanguageQuery\Utility\HttpUtility;
+use KonradMichalik\Typo3NaturalLanguageQuery\Configuration;
+use KonradMichalik\Typo3NaturalLanguageQuery\Entity\Query;
+use KonradMichalik\Typo3NaturalLanguageQuery\Utility\HttpUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
