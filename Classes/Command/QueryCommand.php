@@ -16,8 +16,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class QueryCommand extends Command
 {
-    public function __construct(private readonly Solver $solver, private readonly SchemaService $schemaService, ?string $name = null)
-    {
+    public function __construct(
+        private readonly Solver $solver,
+        private readonly SchemaService $schemaService,
+        ?string $name = null
+    ) {
         parent::__construct($name);
     }
 
@@ -67,12 +70,15 @@ final class QueryCommand extends Command
 
         if ($query->resultSet !== null) {
             $rows = $this->schemaService->prepareResultSet($query);
-            $table = new Table($output);
-            $table
-                ->setHeaders(['UID', 'Label', 'Link'])
-                ->setRows($rows)
-            ;
-            $table->render();
+
+            if (!empty($rows)) {
+                $table = new Table($output);
+                $table
+                    ->setHeaders(['UID', 'Label', 'Link'])
+                    ->setRows($rows)
+                ;
+                $table->render();
+            }
         }
 
         return Command::SUCCESS;
