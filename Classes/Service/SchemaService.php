@@ -184,7 +184,7 @@ final class SchemaService
 
     private function matchesIgnoredTables(string $table): bool
     {
-        foreach ($this->configuration['database']['ignore_tables'] as $ignoredTable) {
+        foreach (explode(',', $this->configuration['database']['ignore_tables']) as $ignoredTable) {
             if (str_contains($ignoredTable, '*')) {
                 $pattern = str_replace('*', '.*', $ignoredTable);
                 if (preg_match('/^' . $pattern . '$/', $table)) {

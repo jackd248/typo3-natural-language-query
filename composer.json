@@ -9,6 +9,7 @@
 		}
 	],
 	"require": {
+		"greenlion/php-sql-parser": "^4.0",
 		"openai-php/client": "^0.10",
 		"typo3/cms-core": "^13.4"
 	},
