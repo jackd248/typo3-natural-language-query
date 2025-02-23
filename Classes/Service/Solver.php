@@ -18,10 +18,10 @@ final class Solver
     ) {
     }
 
-    public function solve(?Query $query = null, ?string $question = null, ?string $table = null): Query
+    public function solve(?Query $query = null, ?string $question = null, ?string $table = null, bool $withAnswer = true): Query
     {
         if ($query === null && $question === null) {
-            throw new \InvalidArgumentException('Either a query or a question must be provided', 1631710733);
+            throw new \InvalidArgumentException('Either a query or a question must be provided', 1740308199);
         }
 
         if ($query === null) {
@@ -37,9 +37,18 @@ final class Solver
         try {
             $this->databaseService->runDatabaseQuery($query);
         } catch (SqlQueryIsNotValid $sqlError) {
+            if ($query->sqlError) {
+                // If we already tried to solve the query with less information, we can throw the error
+                throw $sqlError;
+            }
+
             $query->sqlQuery = null;
             $query->sqlError = $sqlError->getMessage();
             $this->solve($query);
+        }
+
+        if (!$withAnswer) {
+            return $query;
         }
 
         try {
@@ -48,6 +57,11 @@ final class Solver
         } catch (ErrorException $errorException) {
             // If the prompt is too long, we can try to solve the query with less information
             if (str_contains($errorException->getErrorMessage(), 'Please reduce your prompt; or completion length.')) {
+                if ($query->maximumPromptLengthExceeded) {
+                    // Only throw the error if we already tried to solve the query with less information
+                    throw $errorException;
+                }
+
                 $query->maximumPromptLengthExceeded = true;
                 $query->sqlQuery = null;
                 $query->sqlResult = null;
