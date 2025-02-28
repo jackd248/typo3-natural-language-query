@@ -8,10 +8,8 @@ rm -rf /var/www/html/.test/$VERSION/*
 intro_typo3 $VERSION
 install_start $VERSION
 
-composer req typo3/cms-base-distribution:'^13.4' helhum/typo3-console:'^8.2.1' $PACKAGE_NAME:'*@dev' --no-progress -n -d /var/www/html/.test/$VERSION
 composer config minimum-stability dev -d /var/www/html/.test/$VERSION
-composer config repositories.jackd248-faker '{"type": "package", "package": {"name": "georgringer/faker", "version": "dev-v13", "source": {"url": "https://github.com/jackd248/faker", "type": "git", "reference": "v13"}}}' --json -d /var/www/html/.test/$VERSION
-composer req test/sitepackage:'*@dev' --no-progress -n -d /var/www/html/.test/$VERSION
+composer req typo3/cms-base-distribution:'^13.4' helhum/typo3-console:'^8.2.1' $PACKAGE_NAME:'*@dev' test/sitepackage:'*@dev' --no-progress -n -d /var/www/html/.test/$VERSION
 
 cd $BASE_PATH
 TYPO3_INSTALL_DB_DBNAME=$DATABASE
