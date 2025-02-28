@@ -18,7 +18,7 @@ This extension provides a natural language query interface for TYPO3 records.
 You can install the package via composer:
 
 ```bash
-composer require xima/typo3-natural-language-query
+composer require konradmichalik/typo3-natural-language-query
 ```
 
 ## Configuration
@@ -160,6 +160,12 @@ If the SQL query fails, the extension resend the prompt for querying the sql que
 ### Security Considerations
 
 To prevent unauthorized access or data loss, the extension uses strict security measures. It restricts the query capabilities to read-only operations and ignores sensitive tables and fields by default.
+
+You should also consider to use a separate database connection with read-only access to the TYPO3 database.
+
+### Vision
+
+The extension could be a base implementation to extend the list module with a natural language search feature.
 
 ## Development
 
