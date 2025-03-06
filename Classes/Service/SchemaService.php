@@ -199,7 +199,7 @@ final class SchemaService
 
     private function matchesIgnoredFields(string $field): bool
     {
-        foreach ($this->configuration['database']['ignore_fields'] as $ignoredTable) {
+        foreach (explode(',', $this->configuration['database']['ignore_fields']) as $ignoredTable) {
             if ($field === $ignoredTable) {
                 return true;
             }
