@@ -143,6 +143,8 @@ SQLResult: "[{"COUNT(*)":4}]"
 Answer: "
 ```
 
+![Diagram](./Documentation/Images/nlq-diagram.png)
+
 ### Error handling
 
 #### Exceeding prompt length
